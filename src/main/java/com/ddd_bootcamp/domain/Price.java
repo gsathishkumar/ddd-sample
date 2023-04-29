@@ -2,8 +2,9 @@ package com.ddd_bootcamp.domain;
 
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.Objects;
 
-public class Price implements ValueObject<Price> {
+public class Price {
     private BigDecimal value;
     private Currency currency;
 
@@ -12,23 +13,23 @@ public class Price implements ValueObject<Price> {
         this.currency = currency;
     }
 
+    public Price reduceByPercent(int discountPercentage) {
+        return new Price(value.subtract(value.divide(new BigDecimal(discountPercentage))), Currency.getInstance("USD"));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Price price = (Price) o;
-
-        if (!value.equals(price.value)) return false;
-        return currency.equals(price.currency);
+        return Objects.equals(value, price.value) &&
+                Objects.equals(currency, price.currency);
     }
-
     @Override
     public int hashCode() {
-        int result = value.hashCode();
-        result = 31 * result + currency.hashCode();
-        return result;
+        return Objects.hash(value, currency);
     }
+
 
     @Override
     public String toString() {
@@ -36,12 +37,5 @@ public class Price implements ValueObject<Price> {
                 "value=" + value +
                 ", currency=" + currency +
                 '}';
-    }
-
-    @Override
-    public boolean sameValueAs(Price other) {
-        if (this == other) return true;
-        if (!value.equals(other.value)) return false;
-        return currency.equals(other.currency);
     }
 }

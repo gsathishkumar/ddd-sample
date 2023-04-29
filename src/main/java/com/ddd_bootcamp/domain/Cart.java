@@ -1,8 +1,6 @@
 package com.ddd_bootcamp.domain;
 
-import com.ddd_bootcamp.domain.events.DomainEvent;
-import com.ddd_bootcamp.domain.events.ItemAddedToCartEvent;
-import com.ddd_bootcamp.domain.events.ItemRemovedFromCartEvent;
+import com.ddd_bootcamp.domain.events.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -16,6 +14,7 @@ public class Cart implements Entity<Cart> {
     private CartId cartId;
     private List<DomainEvent> events = new ArrayList<>();
     private List<Item> items = new ArrayList<>();
+    private boolean isCheckedOut;
 
     public Cart() {
         cartId = CartId.generateCartId();
@@ -35,10 +34,7 @@ public class Cart implements Entity<Cart> {
 
     @Override
     public String toString() {
-        return "Cart{" +
-                "cartId=" + cartId +
-                ", items=" + items +
-                '}';
+        return items.toString();
     }
 
     public void remove(Item item) {
@@ -46,6 +42,29 @@ public class Cart implements Entity<Cart> {
                 new ItemRemovedFromCartEvent(item.getProductName());
 
         apply(itemRemovedFromCartEvent);
+    }
+
+    public Order checkOut() {
+        List<CartItem> cartItems = items.stream().map(item ->
+                new CartItem(item.getProductName(),
+                        item.getProductPrice(),
+                        item.getQuantity())).collect(Collectors.toList());
+
+        apply(new CartCheckedOutEvent(cartItems));
+
+        List<Product> products = items.stream().flatMap(item ->
+                item.getFlattenedProducts().stream()).collect(Collectors.toList());
+        return new Order(products);
+    }
+
+
+    public void checkOut1() {
+        List<CartItem> cartItems = items.stream().map(item ->
+                new CartItem(item.getProductName(),
+                        item.getProductPrice(),
+                        item.getQuantity())).collect(Collectors.toList());
+
+        apply(new CartCheckedOutEvent(cartItems));
     }
 
     private void apply(ItemAddedToCartEvent event) {
@@ -57,6 +76,11 @@ public class Cart implements Entity<Cart> {
         events.add(event);
         this.items.
                 remove(this.items.stream().filter(item -> item.getProductName().equals(event.getProductName())).findFirst().get());
+    }
+
+    private void apply(CartCheckedOutEvent event) {
+        events.add(event);
+        this.isCheckedOut = true;
     }
 
     public Set<String> removedProductNames() {

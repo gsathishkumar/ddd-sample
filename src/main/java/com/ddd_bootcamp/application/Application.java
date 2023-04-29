@@ -4,6 +4,8 @@ import com.ddd_bootcamp.domain.Cart;
 import com.ddd_bootcamp.domain.Item;
 import com.ddd_bootcamp.domain.Price;
 import com.ddd_bootcamp.domain.Product;
+import com.ddd_bootcamp.domain.domain_service.CheckOutService;
+import com.ddd_bootcamp.domain.domain_service.CompetitorBasedPricer;
 
 import java.math.BigDecimal;
 import java.util.Currency;
@@ -23,36 +25,27 @@ public class Application {
         Item applePencilItem = new Item(applePencil, 2);
         cart.add(applePencilItem);
 
-        List<Item> items = cart.getItems();
-        System.out.println("items = " + items);
 
-        Product applePencil1 = new Product("Apple Pencil",
-                new Price(BigDecimal.valueOf(10), Currency.getInstance("USD")));
-        Item applePencilItem1 = new Item(applePencil1, 2);
-
-        cart.remove(applePencilItem1);
-
-
-        System.out.println("After Removing Apple Pencil with 2 quantity");
         System.out.println("Cart = " + cart);
-        List<Item> items1 = cart.getItems();
-        System.out.println("items = " + items1);
 
-        System.out.println("----------------------------------------");
-        Price price1 = new Price(new BigDecimal(11), Currency.getInstance("USD"));
-        Price price2 = new Price(new BigDecimal(11), Currency.getInstance("USD"));
-        System.out.println("price 1 and price 2 sameValueAs :" + price1.sameValueAs(price2));
-        System.out.println("price 1 and price 2 equals :" + price1.equals(price2));
+        System.out.println("-------------------------------------------------------------------");
 
-        System.out.println("----------------------------------------");
+        System.out.println("Cart checked out = " + cart.checkOut());
+        //System.out.println("Cart checked out = " + CheckOutService.checkOut(cart));
 
+        System.out.println("-------------------------------------------------------------------");
 
-
-
-
+        //codeProblem8();
         //Code Problem 6
         //codeProblem6();
 
+    }
+
+    private static void codeProblem8() {
+        System.out.println("-------------------------------------------------------------------");
+        System.out.println("Discounted Price for Apple Pencil: " + CompetitorBasedPricer.getPrice("Apple Pencil"));
+        System.out.println("Discounted Price for Sony Wireless headphone: " + CompetitorBasedPricer.getPrice("Sony Wireless headphone"));
+        System.out.println("-------------------------------------------------------------------");
     }
 
 
@@ -60,12 +53,10 @@ public class Application {
         Cart cart1 = new Cart();
         Cart cart2 = new Cart();
 
-        Product headphone1 = new Product("Sony Wireless headphone",
-                new Price(BigDecimal.valueOf(10), Currency.getInstance("USD")));
+        Product headphone1 = new Product("Sony Wireless headphone", new Price(BigDecimal.valueOf(10), Currency.getInstance("USD")));
         Item headphoneItem1 = new Item(headphone1, 1);
 
-        Product headphone2 = new Product("Sony Wireless headphone",
-                new Price(BigDecimal.valueOf(10), Currency.getInstance("USD")));
+        Product headphone2 = new Product("Sony Wireless headphone", new Price(BigDecimal.valueOf(10), Currency.getInstance("USD")));
         Item headphoneItem2 = new Item(headphone2, 1);
 
         cart1.add(headphoneItem1);
