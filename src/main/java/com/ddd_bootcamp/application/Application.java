@@ -1,68 +1,60 @@
 package com.ddd_bootcamp.application;
 
-import com.ddd_bootcamp.domain.Cart;
-import com.ddd_bootcamp.domain.Item;
-import com.ddd_bootcamp.domain.Price;
-import com.ddd_bootcamp.domain.Product;
-import com.ddd_bootcamp.domain.domain_service.CheckOutService;
-import com.ddd_bootcamp.domain.domain_service.CompetitorBasedPricer;
+import com.ddd_bootcamp.domain.Account;
+import com.ddd_bootcamp.domain.Address;
+import com.ddd_bootcamp.domain.Customer;
 
-import java.math.BigDecimal;
-import java.util.Currency;
-import java.util.List;
+/**
+ *
+ * Code Problem 10:
+ * Customer and Bank Account. ( Not related to e-commerce domain)
+ * When Customer’s Address is updated, update all her Bank Accounts addresses as well. ( This is invariant, or business rules or consistency rule given by business)
+ * --
+ * Note –
+ * Customer is Entity.  Account is Entity.
+ *  Customer has List of bank accounts.
+ *  Customer has Address.  Account has Address
+ *  Address has one attribute called city.
+ *  Address is Value Object
+ *  --  customer.updateAddress(new Address(“Mumbai”))
+ */
+
+/**
+ *
+ * Database transactions -  ACID
+ *
+ * ACID =>  Entity says I will take care of  AC ( Atomic and Consistent).
+ * then
+ * Entity -> upgrades to -> Aggregate
+ *
+ * Aggregate and Aggregate root are Customer
+ *
+ * Aggregate root - Entity which is at top
+ *
+ *
+ */
+
+
 
 public class Application {
     public static void main(String[] args) {
-        Cart cart = new Cart();
+        Address address = new Address("Pune");
+        Customer customer = new Customer(address);
 
-        Product headphone = new Product("Sony Wireless headphone",
-                new Price(BigDecimal.valueOf(10), Currency.getInstance("USD")));
-        Item headphoneItem = new Item(headphone, 1);
-        cart.add(headphoneItem);
+        Account account = new Account();
+        customer.addAccount(account);
 
-        Product applePencil = new Product("Apple Pencil",
-                new Price(BigDecimal.valueOf(100), Currency.getInstance("USD")));
-        Item applePencilItem = new Item(applePencil, 2);
-        cart.add(applePencilItem);
+        System.out.println("---------------------------------------------------------");
+        System.out.println("Before Address Change = " + customer);
+        System.out.println("---------------------------------------------------------");
 
+        Address newAddress = new Address("Mumbai");
+        //start database transaction
+        customer.updateAddress(newAddress);
+        //end database transaction
 
-        System.out.println("Cart = " + cart);
-
-        System.out.println("-------------------------------------------------------------------");
-
-        System.out.println("Cart checked out = " + cart.checkOut());
-        //System.out.println("Cart checked out = " + CheckOutService.checkOut(cart));
-
-        System.out.println("-------------------------------------------------------------------");
-
-        //codeProblem8();
-        //Code Problem 6
-        //codeProblem6();
-
-    }
-
-    private static void codeProblem8() {
-        System.out.println("-------------------------------------------------------------------");
-        System.out.println("Discounted Price for Apple Pencil: " + CompetitorBasedPricer.getPrice("Apple Pencil"));
-        System.out.println("Discounted Price for Sony Wireless headphone: " + CompetitorBasedPricer.getPrice("Sony Wireless headphone"));
-        System.out.println("-------------------------------------------------------------------");
-    }
-
-
-    private static void codeProblem6() {
-        Cart cart1 = new Cart();
-        Cart cart2 = new Cart();
-
-        Product headphone1 = new Product("Sony Wireless headphone", new Price(BigDecimal.valueOf(10), Currency.getInstance("USD")));
-        Item headphoneItem1 = new Item(headphone1, 1);
-
-        Product headphone2 = new Product("Sony Wireless headphone", new Price(BigDecimal.valueOf(10), Currency.getInstance("USD")));
-        Item headphoneItem2 = new Item(headphone2, 1);
-
-        cart1.add(headphoneItem1);
-        cart2.add(headphoneItem2);
-
-        System.out.println(cart1.equals(cart2) ? "Carts are same" : "Carts are different");
-        System.out.println(cart1.hasSameIdentityAs(cart2) ? "Carts are same" : "Carts are different");
+        System.out.println("---------------------------------------------------------");
+        System.out.println("After Address Change = " + customer);
+        System.out.println("---------------------------------------------------------");
     }
 }
